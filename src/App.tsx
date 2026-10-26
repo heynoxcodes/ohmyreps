@@ -31,6 +31,16 @@ import {
 import { 
   CustomSheetModal 
 } from './components/CustomSheetModal.tsx';
+import {
+  LoadingScreen
+} from './components/LoadingScreen.tsx';
+import {
+  BestPicksCarousel
+} from './components/BestPicksCarousel.tsx';
+import {
+  getOmrFeaturedOrder,
+  getBestPicksForCategory
+} from './utils/featuredOrder.ts';
 import { 
   ProductItem, 
   AgentId, 
@@ -121,6 +131,10 @@ export default function App() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
   const [visibleCount, setVisibleCount] = useState<number>(60);
 
+  // --- Initial Loading Screen (waits for spreadsheet + initial images unless skipped) ---
+  const [isLoadingScreenSkipped, setIsLoadingScreenSkipped] = useState<boolean>(false);
+  const [loadedImageIds, setLoadedImageIds] = useState<Record<string, boolean>>({});
+
   // --- Modals State (Open Welcome & Agent Coupon Popup automatically on arrival!) ---
   const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(() => {
     const saved = localStorage.getItem('ohmyreps_show_coupon_on_arrival');
@@ -128,6 +142,10 @@ export default function App() {
   });
   const [isCustomSheetModalOpen, setIsCustomSheetModalOpen] = useState<boolean>(false);
   const [activeQcProduct, setActiveQcProduct] = useState<ProductItem | null>(null);
+
+  const handleProductImageLoaded = useCallback((id: string) => {
+    setLoadedImageIds(prev => (prev[id] ? prev : { ...prev, [id]: true }));
+  }, []);
 
   // Clean up any legacy mutable referral keys from localStorage on mount
   useEffect(() => {
@@ -152,7 +170,7 @@ export default function App() {
     localStorage.setItem(STORAGE_KEYS.SHEET_ID, sheetId);
   }, [sheetId]);
 
-  // Fetch sheet items for active tab
+  // Fetch sheet items for active tab (with automatic static snapshot fallback)
   const fetchItemsForTab = useCallback(async (gid: string, force = false) => {
     if (!force && tabItems[gid] && tabItems[gid].length > 0) {
       return;
@@ -165,20 +183,53 @@ export default function App() {
     }
     setErrorMsg('');
 
+    const loadStaticSnapshot = async (): Promise<boolean> => {
+      try {
+        const snapRes = await fetch('/sheet-snapshot.json');
+        if (!snapRes.ok) return false;
+        const snap = await snapRes.json();
+        if (snap && snap.tabs) {
+          const allTabs = snap.tabs as Record<string, ProductItem[]>;
+          setTabItems(prev => ({ ...allTabs, ...prev, ...(allTabs[gid] ? { [gid]: allTabs[gid] } : {}) }));
+          const counts: Record<string, number> = {};
+          for (const [k, arr] of Object.entries(allTabs)) {
+            if (Array.isArray(arr)) counts[k] = arr.length;
+          }
+          setTabCounts(prev => ({ ...counts, ...prev }));
+          setLastSyncedDate(new Date(snap.lastSynced || Date.now()));
+          return true;
+        }
+      } catch {
+        // ignore fallback error
+      }
+      return false;
+    };
+
     try {
       const res = await fetch(`/api/sheet-data?gid=${gid}&sheetId=${sheetId}${force ? '&force=true' : ''}`);
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
 
-      if (data.success && Array.isArray(data.items)) {
-        setTabItems(prev => ({ ...prev, [gid]: data.items }));
-        setTabCounts(prev => ({ ...prev, [gid]: data.items.length }));
-        setLastSyncedDate(new Date(data.lastSynced || Date.now()));
-      } else {
-        setErrorMsg(data.error || 'Failed to load spreadsheet items');
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.items) && data.items.length > 0) {
+          setTabItems(prev => ({ ...prev, [gid]: data.items }));
+          setTabCounts(prev => ({ ...prev, [gid]: data.items.length }));
+          setLastSyncedDate(new Date(data.lastSynced || Date.now()));
+          return;
+        }
+      }
+
+      // Fallback to bundled /sheet-snapshot.json if live API is unreachable or returns HTML
+      const fallbackOk = await loadStaticSnapshot();
+      if (!fallbackOk) {
+        setErrorMsg('Failed to load spreadsheet items');
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Network error loading sheet data';
-      setErrorMsg(msg);
+      const fallbackOk = await loadStaticSnapshot();
+      if (!fallbackOk) {
+        const msg = err instanceof Error ? err.message : 'Network error loading sheet data';
+        setErrorMsg(msg);
+      }
     } finally {
       setIsLoading(false);
       setIsSyncing(false);
@@ -219,10 +270,18 @@ export default function App() {
     fetchItemsForTab(activeGid, true);
   };
 
-  // Current raw items for this category
-  const currentItems = useMemo(() => {
+  // Current items for this category in custom OHMYREPS! Featured order
+  const rawCategoryItems = useMemo(() => {
     return tabItems[activeGid] || [];
   }, [tabItems, activeGid]);
+
+  const currentItems = useMemo(() => {
+    return getOmrFeaturedOrder(rawCategoryItems, activeGid);
+  }, [rawCategoryItems, activeGid]);
+
+  const bestPicks = useMemo(() => {
+    return getBestPicksForCategory(rawCategoryItems, activeGid);
+  }, [rawCategoryItems, activeGid]);
 
   // Unique sellers list
   const sellers = useMemo(() => {
@@ -307,8 +366,29 @@ export default function App() {
   const activeCategory = tabs.find(t => t.gid === activeGid)?.name || 'Category';
   const currentAgentConfig = DEFAULT_AGENTS.find(a => a.id === selectedAgent) || DEFAULT_AGENTS[0];
 
+  // Track the first 15 product images in the current view; loading screen stays until they load or user clicks Skip
+  const trackedImageItems = useMemo(() => {
+    return currentItems.filter(item => Boolean(item.image)).slice(0, 15);
+  }, [currentItems]);
+
+  const targetImagesCount = trackedImageItems.length;
+  const loadedImagesCount = useMemo(() => {
+    return trackedImageItems.reduce((acc, item) => acc + (loadedImageIds[item.id] ? 1 : 0), 0);
+  }, [trackedImageItems, loadedImageIds]);
+
+  const areInitialImagesReady = !isLoading && targetImagesCount > 0 && loadedImagesCount >= targetImagesCount;
+  const showLoadingScreen = !isGuideActive && !isSellersActive && !isLoadingScreenSkipped && !areInitialImagesReady;
+
   return (
     <div className="min-h-screen bg-[#05070B] text-zinc-100 flex flex-col font-sans">
+      <LoadingScreen
+        isOpen={showLoadingScreen}
+        isFetchingSheet={isLoading}
+        loadedImagesCount={loadedImagesCount}
+        targetImagesCount={targetImagesCount}
+        categoryName={activeCategory}
+        onSkip={() => setIsLoadingScreenSkipped(true)}
+      />
       {/* 1. Header with Burger Menu, OMR Logo, Currency & Saved Agent Selector */}
       <Header
         selectedAgent={selectedAgent}
@@ -395,6 +475,18 @@ export default function App() {
         />
       ) : (
         <>
+          {!isLoading && !showFavoritesOnly && !searchQuery.trim() && (
+            <BestPicksCarousel
+              picks={bestPicks}
+              categoryName={activeCategory}
+              selectedAgent={selectedAgent}
+              currency={currency}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+              onOpenQcModal={setActiveQcProduct}
+            />
+          )}
+
           <FilterBar
             totalCount={currentItems.length}
             filteredCount={filteredItems.length}
@@ -471,7 +563,7 @@ export default function App() {
               /* Grid View with Progressive Infinite Scroll */
               <div className="space-y-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                  {filteredItems.slice(0, visibleCount).map((product) => (
+                  {filteredItems.slice(0, visibleCount).map((product, idx) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -481,6 +573,8 @@ export default function App() {
                       isFavorite={favorites.includes(product.id)}
                       onToggleFavorite={handleToggleFavorite}
                       onOpenQcModal={setActiveQcProduct}
+                      eagerLoad={idx < 15}
+                      onImageLoaded={handleProductImageLoaded}
                     />
                   ))}
                 </div>
@@ -762,7 +856,7 @@ export default function App() {
       />
 
       <AgentCompareModal
-        isOpen={isCompareModalOpen}
+        isOpen={isCompareModalOpen && !showLoadingScreen}
         onClose={() => setIsCompareModalOpen(false)}
         selectedAgent={selectedAgent}
         onSelectAgent={setSelectedAgent}

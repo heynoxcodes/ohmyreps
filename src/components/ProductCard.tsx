@@ -28,6 +28,8 @@ interface ProductCardProps {
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onOpenQcModal: (product: ProductItem) => void;
+  eagerLoad?: boolean;
+  onImageLoaded?: (id: string) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -38,6 +40,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isFavorite,
   onToggleFavorite,
   onOpenQcModal,
+  eagerLoad = false,
+  onImageLoaded,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isAgentMenuOpen, setIsAgentMenuOpen] = useState(false);
@@ -123,9 +127,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <img
                   src={resolvedImageUrl}
                   alt={product.title}
-                  onLoad={() => setImgLoaded(true)}
+                  onLoad={() => {
+                    setImgLoaded(true);
+                    onImageLoaded?.(product.id);
+                  }}
                   onError={handleImageError}
-                  loading="lazy"
+                  loading={eagerLoad ? 'eager' : 'lazy'}
                   className={`h-full w-full object-cover transition-all duration-500 ease-out group-hover:scale-108 ${
                     imgLoaded ? 'opacity-100' : 'opacity-0'
                   }`}
