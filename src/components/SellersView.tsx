@@ -761,7 +761,7 @@ export const SellersView: React.FC<SellersViewProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 space-y-6">
+    <div className="mx-auto w-full min-w-0 max-w-7xl px-4 py-6 space-y-6">
       {/* Compact Header Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-[#0B1325] via-[#090E1A] to-[#05070B] p-5 sm:p-6 shadow-[0_16px_45px_rgba(0,0,0,0.55)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

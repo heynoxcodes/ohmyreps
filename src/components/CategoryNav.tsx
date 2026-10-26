@@ -54,7 +54,7 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
   }
 
   return (
-    <div id="catalog-section" className="mx-auto max-w-7xl px-4 pt-1 pb-1">
+    <div id="catalog-section" className="mx-auto w-full min-w-0 max-w-7xl px-4 pt-1 pb-1">
       <div className="flex items-center gap-2 overflow-x-auto pb-2.5 scrollbar-none border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = !isGuideActive && !isSellersActive && tab.gid === activeGid;

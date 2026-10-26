@@ -99,7 +99,7 @@ export const GuideView: React.FC<GuideViewProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="mx-auto max-w-5xl px-4 py-6 space-y-6"
+      className="mx-auto w-full min-w-0 max-w-5xl px-4 py-6 space-y-6"
     >
       {/* Header */}
       <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-br from-[#0D1830] via-[#0B101B] to-[#05070B] p-6">

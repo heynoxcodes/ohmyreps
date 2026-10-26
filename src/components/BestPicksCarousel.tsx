@@ -106,7 +106,7 @@ export const BestPicksCarousel: React.FC<BestPicksCarouselProps> = ({
       aria-label={`Best Picks in ${categoryName}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="mx-auto max-w-7xl w-full px-4 pt-4 pb-1"
+      className="mx-auto max-w-7xl w-full min-w-0 px-4 pt-4 pb-1"
     >
       <div className="relative overflow-hidden rounded-3xl border border-amber-500/25 bg-gradient-to-b from-[#0E1525]/95 via-[#090E1A]/95 to-[#060911]/95 p-3.5 sm:p-5 shadow-[0_14px_45px_rgba(0,0,0,0.65)]">
         {/* Ambient golden & electric blue background glow */}

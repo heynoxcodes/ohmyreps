@@ -41,7 +41,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   hasActiveFilters,
 }) => {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-2">
+    <div className="mx-auto w-full min-w-0 max-w-7xl px-4 py-2">
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
         {/* Left: Item counter & reset */}
         <div className="flex items-center gap-2">

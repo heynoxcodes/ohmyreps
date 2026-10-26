@@ -353,7 +353,7 @@ export default function App() {
   const showLoadingScreen = !isGuideActive && !isSellersActive && !isLoadingScreenSkipped && !areInitialImagesReady;
 
   return (
-    <div className="min-h-screen bg-[#05070B] text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen w-full max-w-full overflow-x-clip bg-[#05070B] text-zinc-100 flex flex-col font-sans">
       <LoadingScreen
         isOpen={showLoadingScreen}
         isFetchingSheet={isLoading}
@@ -476,7 +476,7 @@ export default function App() {
             hasActiveFilters={hasActiveFilters}
           />
 
-          <main className="mx-auto max-w-7xl flex-1 w-full px-4 py-4">
+          <main className="mx-auto max-w-7xl flex-1 w-full min-w-0 px-4 py-4">
             {/* Error message with retry */}
             {errorMsg && (
               <div className="mb-4 flex items-center justify-between rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-300">
