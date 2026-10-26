@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  RefreshCw, 
   Heart, 
   ChevronDown, 
-  FileSpreadsheet,
   Menu,
   X,
   ShieldCheck,
@@ -33,12 +31,8 @@ interface HeaderProps {
   onSelectCurrency: (currency: CurrencyCode) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onSync: () => void;
-  isSyncing: boolean;
-  lastSyncedText: string;
   itemCount: number;
   onOpenCompareModal: () => void;
-  onOpenCustomSheetModal: () => void;
   showFavoritesOnly: boolean;
   onToggleFavorites: () => void;
   favoritesCount: number;
@@ -154,12 +148,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectAgent,
   currency,
   onSelectCurrency,
-  onSync,
-  isSyncing,
-  lastSyncedText,
   itemCount,
   onOpenCompareModal,
-  onOpenCustomSheetModal,
   showFavoritesOnly,
   onToggleFavorites,
   favoritesCount,
@@ -515,45 +505,19 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               {/* Drawer Footer */}
-              <div className="p-4 border-t border-white/10 bg-[#05070B] space-y-2">
-                {currentAgent.signupUrl && (
+              {currentAgent.signupUrl && (
+                <div className="p-4 border-t border-white/10 bg-[#05070B]">
                   <a
                     href={currentAgent.signupUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] hover:bg-blue-500 py-2 text-xs font-extrabold text-white transition-colors"
+                    className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] hover:bg-blue-500 py-2.5 text-xs font-extrabold text-white transition-colors"
                   >
                     <span>Claim {currentAgent.name} Coupons</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
-                )}
-
-                <div className="flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSync();
-                      setIsBurgerOpen(false);
-                    }}
-                    disabled={isSyncing}
-                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] py-1.5 text-[11px] text-slate-400 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-blue-400' : ''}`} />
-                    <span>Sync ({lastSyncedText})</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsBurgerOpen(false);
-                      onOpenCustomSheetModal();
-                    }}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] px-3 py-1.5 text-[11px] text-slate-400 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-3 h-3" />
-                    <span>Sheet</span>
-                  </button>
                 </div>
-              </div>
+              )}
             </motion.aside>
           </>
         )}

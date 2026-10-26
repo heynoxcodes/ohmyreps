@@ -54,7 +54,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             </h2>
             <p className="text-xs text-slate-400 mb-6">
               {!sheetDone
-                ? 'Syncing spreadsheet catalog & agent links...'
+                ? 'Loading catalog & agent links...'
                 : `Waiting for product photos to load (${clampedLoaded} / ${targetImagesCount})...`}
             </p>
 
@@ -73,7 +73,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-300">
                   <Database className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  <span>Spreadsheet catalog</span>
+                  <span>Product catalog</span>
                 </div>
                 {sheetDone ? (
                   <span className="flex items-center gap-1 font-mono text-[11px] text-emerald-400 font-bold">

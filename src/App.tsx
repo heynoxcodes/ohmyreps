@@ -28,9 +28,6 @@ import {
 import { 
   AgentCompareModal 
 } from './components/AgentCompareModal.tsx';
-import { 
-  CustomSheetModal 
-} from './components/CustomSheetModal.tsx';
 import {
   LoadingScreen
 } from './components/LoadingScreen.tsx';
@@ -79,7 +76,6 @@ const STORAGE_KEYS = {
   AGENT: 'repfinds_selected_agent_v2',
   CURRENCY: 'ohmyreps_currency',
   FAVORITES: 'repfinds_favorites',
-  SHEET_ID: 'repfinds_sheet_id',
 };
 
 export default function App() {
@@ -104,11 +100,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [sheetId, setSheetId] = useState<string>(() => {
-    return localStorage.getItem(STORAGE_KEYS.SHEET_ID) || DEFAULT_SHEET_ID;
-  });
-
-  // --- Sheet Data & Tabs State ---
+  // --- Catalog Data & Tabs State ---
   const [tabs] = useState<SheetTab[]>(SHEET_TABS);
   const [activeGid, setActiveGid] = useState<string>('171908810'); // Default: Clothes
   const [isGuideActive, setIsGuideActive] = useState<boolean>(() => initialUrlParams.get('view') === 'guide');
@@ -117,8 +109,6 @@ export default function App() {
   const [tabItems, setTabItems] = useState<Record<string, ProductItem[]>>({});
   const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [lastSyncedDate, setLastSyncedDate] = useState<Date>(new Date());
   const [errorMsg, setErrorMsg] = useState<string>('');
 
   // --- Filter & Search State ---
@@ -131,7 +121,7 @@ export default function App() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState<boolean>(false);
   const [visibleCount, setVisibleCount] = useState<number>(60);
 
-  // --- Initial Loading Screen (waits for spreadsheet + initial images unless skipped) ---
+  // --- Initial Loading Screen (waits for catalog + initial images unless skipped) ---
   const [isLoadingScreenSkipped, setIsLoadingScreenSkipped] = useState<boolean>(false);
   const [loadedImageIds, setLoadedImageIds] = useState<Record<string, boolean>>({});
 
@@ -140,17 +130,17 @@ export default function App() {
     const saved = localStorage.getItem('ohmyreps_show_coupon_on_arrival');
     return saved === null ? true : saved === 'true';
   });
-  const [isCustomSheetModalOpen, setIsCustomSheetModalOpen] = useState<boolean>(false);
   const [activeQcProduct, setActiveQcProduct] = useState<ProductItem | null>(null);
 
   const handleProductImageLoaded = useCallback((id: string) => {
     setLoadedImageIds(prev => (prev[id] ? prev : { ...prev, [id]: true }));
   }, []);
 
-  // Clean up any legacy mutable referral keys from localStorage on mount
+  // Clean up any legacy mutable referral or custom sheet keys from localStorage on mount
   useEffect(() => {
     localStorage.removeItem('repfinds_referral_codes');
     localStorage.removeItem('repfinds_selected_agent');
+    localStorage.removeItem('repfinds_sheet_id');
   }, []);
 
   // Save preferred agent automatically to localStorage whenever changed
@@ -166,19 +156,13 @@ export default function App() {
     localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
   }, [favorites]);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.SHEET_ID, sheetId);
-  }, [sheetId]);
-
-  // Fetch sheet items for active tab (with automatic static snapshot fallback)
+  // Fetch catalog items for active tab (with automatic static snapshot fallback)
   const fetchItemsForTab = useCallback(async (gid: string, force = false) => {
     if (!force && tabItems[gid] && tabItems[gid].length > 0) {
       return;
     }
 
-    if (force) {
-      setIsSyncing(true);
-    } else {
+    if (!force) {
       setIsLoading(true);
     }
     setErrorMsg('');
@@ -196,7 +180,6 @@ export default function App() {
             if (Array.isArray(arr)) counts[k] = arr.length;
           }
           setTabCounts(prev => ({ ...counts, ...prev }));
-          setLastSyncedDate(new Date(snap.lastSynced || Date.now()));
           return true;
         }
       } catch {
@@ -206,7 +189,7 @@ export default function App() {
     };
 
     try {
-      const res = await fetch(`/api/sheet-data?gid=${gid}&sheetId=${sheetId}${force ? '&force=true' : ''}`);
+      const res = await fetch(`/api/sheet-data?gid=${gid}&sheetId=${DEFAULT_SHEET_ID}${force ? '&force=true' : ''}`);
       const contentType = res.headers.get('content-type') || '';
 
       if (res.ok && contentType.includes('application/json')) {
@@ -214,7 +197,6 @@ export default function App() {
         if (data.success && Array.isArray(data.items) && data.items.length > 0) {
           setTabItems(prev => ({ ...prev, [gid]: data.items }));
           setTabCounts(prev => ({ ...prev, [gid]: data.items.length }));
-          setLastSyncedDate(new Date(data.lastSynced || Date.now()));
           return;
         }
       }
@@ -222,19 +204,18 @@ export default function App() {
       // Fallback to bundled /sheet-snapshot.json if live API is unreachable or returns HTML
       const fallbackOk = await loadStaticSnapshot();
       if (!fallbackOk) {
-        setErrorMsg('Failed to load spreadsheet items');
+        setErrorMsg('Failed to load catalog items');
       }
     } catch (err: unknown) {
       const fallbackOk = await loadStaticSnapshot();
       if (!fallbackOk) {
-        const msg = err instanceof Error ? err.message : 'Network error loading sheet data';
+        const msg = err instanceof Error ? err.message : 'Network error loading catalog';
         setErrorMsg(msg);
       }
     } finally {
       setIsLoading(false);
-      setIsSyncing(false);
     }
-  }, [sheetId, tabItems]);
+  }, [tabItems]);
 
   useEffect(() => {
     fetchItemsForTab(activeGid);
@@ -260,14 +241,6 @@ export default function App() {
   const handleSelectTab = (gid: string) => {
     setActiveGid(gid);
     setSelectedSeller('');
-  };
-
-  // Change sheet ID
-  const handleChangeSheetId = (newId: string) => {
-    setSheetId(newId);
-    setTabItems({});
-    setTabCounts({});
-    fetchItemsForTab(activeGid, true);
   };
 
   // Current items for this category in custom OHMYREPS! Featured order
@@ -403,12 +376,8 @@ export default function App() {
             setIsSellersActive(false);
           }
         }}
-        onSync={handleSyncNow}
-        isSyncing={isSyncing}
-        lastSyncedText={lastSyncedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         itemCount={currentItems.length}
         onOpenCompareModal={() => setIsCompareModalOpen(true)}
-        onOpenCustomSheetModal={() => setIsCustomSheetModalOpen(true)}
         showFavoritesOnly={showFavoritesOnly}
         onToggleFavorites={() => {
           setIsGuideActive(false);
@@ -752,13 +721,6 @@ export default function App() {
             >
               Agents & Coupons
             </button>
-            <span className="text-slate-700" aria-hidden="true">·</span>
-            <button
-              onClick={() => setIsCustomSheetModalOpen(true)}
-              className="text-slate-400 hover:text-white cursor-pointer"
-            >
-              Sheet Source
-            </button>
           </div>
         </div>
       </footer>
@@ -860,13 +822,6 @@ export default function App() {
         onClose={() => setIsCompareModalOpen(false)}
         selectedAgent={selectedAgent}
         onSelectAgent={setSelectedAgent}
-      />
-
-      <CustomSheetModal
-        isOpen={isCustomSheetModalOpen}
-        onClose={() => setIsCustomSheetModalOpen(false)}
-        currentSheetId={sheetId}
-        onChangeSheetId={handleChangeSheetId}
       />
     </div>
   );
