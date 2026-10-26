@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan to overhaul the Chinese Agent system: set CNShopper as the default featured agent, hardcode and permanently lock all 12 user affiliate links across every spreadsheet item, remove raided/bad agents (Mulebuy, ACBuy, CNfans, Hoobuy, Joyagoo) from buy actions while displaying RAIDED/AVOID warnings in the Agent Guide, and add a high-converting Referral Buy & Signup Popup flow.",
+  "updatedAt":  "2026-10-25T21:15:29.531413309Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

@@ -1,0 +1,6 @@
+{
+  "name": "RepFinds Hub - Chinese Agent Spreadsheet & Haul Engine",
+  "description": "Live-syncing rep spreadsheet catalog inspired by Bolonart, FeteFinds, and RepSpark. Real-time Google Sheet inventory, multi-agent affiliate link converter, QC inspector, and haul shipping calculator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
