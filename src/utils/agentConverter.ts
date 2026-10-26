@@ -1,4 +1,4 @@
-import { AgentId, AgentConfig, BlacklistedAgent, CurrencyCode } from '../types/index.ts';
+import { AgentId, AgentConfig, BlacklistedAgent, CurrencyCode } from '../types/index';
 
 export interface ParsedProductUrl {
   platform: 'weidian' | 'taobao' | '1688' | 'tmall' | 'unknown';

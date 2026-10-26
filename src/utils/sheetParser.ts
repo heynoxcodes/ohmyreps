@@ -1,5 +1,5 @@
-import { ProductItem, SheetTab } from '../types/index.ts';
-import { parseProductUrl } from './agentConverter.ts';
+import { ProductItem, SheetTab } from '../types/index';
+import { parseProductUrl } from './agentConverter';
 
 export const SHEET_TABS: SheetTab[] = [
   { id: 'clothes', name: 'Clothes', gid: '171908810', iconName: 'Shirt' },

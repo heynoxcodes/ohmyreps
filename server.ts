@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
-import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parseSheetHtml, SHEET_TABS, DEFAULT_SHEET_ID } from './src/utils/sheetParser.ts';
-import { DEFAULT_AGENTS } from './src/utils/agentConverter.ts';
-import { ProductItem } from './src/types/index.ts';
+import { parseSheetHtml, SHEET_TABS, DEFAULT_SHEET_ID } from './src/utils/sheetParser';
+import { DEFAULT_AGENTS } from './src/utils/agentConverter';
+import { ProductItem } from './src/types/index';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -334,6 +333,7 @@ async function startServer() {
   const numericPort = Number(PORT) || 3000;
 
   if (!isProduction) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
