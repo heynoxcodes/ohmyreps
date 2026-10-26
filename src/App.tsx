@@ -627,9 +627,6 @@ export default function App() {
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3">
             <OhMyRepsLogo size="sm" />
-            <span className="text-slate-400">
-              · Verified Marketplace Directory & Direct Agent Router
-            </span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-[11px]">
@@ -641,7 +638,7 @@ export default function App() {
               }}
               className="text-[#38BDF8] hover:text-white font-bold cursor-pointer"
             >
-              Trusted Brand Yupoos (54+ Brands)
+              Sellers
             </button>
             <span className="text-slate-700" aria-hidden="true">·</span>
             <button
@@ -652,14 +649,14 @@ export default function App() {
               }}
               className="text-blue-400 hover:text-blue-300 font-bold cursor-pointer"
             >
-              Ordering & QC Guide
+              How to Order
             </button>
             <span className="text-slate-700" aria-hidden="true">·</span>
             <button
               onClick={() => setIsCompareModalOpen(true)}
               className="text-slate-300 hover:text-white font-semibold cursor-pointer"
             >
-              Agent Status & Signup Coupons
+              Agents & Coupons
             </button>
             <span className="text-slate-700" aria-hidden="true">·</span>
             <button
@@ -710,7 +707,7 @@ export default function App() {
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>54 Yupoos</span>
+            <span>Sellers</span>
           </button>
 
           <button

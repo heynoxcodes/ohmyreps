@@ -49,15 +49,13 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
   isSellersActive,
   onToggleSellers,
 }) => {
-  // When viewing the Trusted Yupoo Sellers or Guide page, hide the spreadsheet category tabs so the layout stays clean
   if (isSellersActive || isGuideActive) {
     return null;
   }
 
   return (
     <div id="catalog-section" className="mx-auto max-w-7xl px-4 pt-1 pb-1">
-      <div className="flex items-center gap-2 overflow-x-auto pb-2.5 scrollbar-none border-b border-blue-500/15">
-        {/* Spreadsheet Category Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2.5 scrollbar-none border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = !isGuideActive && !isSellersActive && tab.gid === activeGid;
           const count = tabCounts[tab.gid];
@@ -67,7 +65,6 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
             <motion.button
               key={tab.gid}
               type="button"
-              whileHover={{ y: -1 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => {
                 onToggleGuide(false);
@@ -77,14 +74,14 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
               className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                 isActive
                   ? 'text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
-                  : 'bg-[#0B101B]/80 text-slate-400 hover:text-white hover:bg-[#11192B] border border-blue-500/20'
+                  : 'bg-[#0B101B] text-slate-400 hover:text-white border border-white/10'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="omrActiveCategoryTab"
                   transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                  className="absolute inset-0 rounded-full bg-[#2563EB] border border-blue-400/50 -z-10"
+                  className="absolute inset-0 rounded-full bg-[#2563EB] -z-10"
                 />
               )}
               <span className={isActive ? 'text-white' : 'text-blue-400'}>
@@ -106,17 +103,17 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
 
         <div className="h-5 w-[1px] bg-white/10 shrink-0 mx-0.5" />
 
-        {/* Quick Link Pill to Trusted Brand Yupoo Sellers */}
+        {/* Clean Sellers Tab */}
         <button
           type="button"
           onClick={() => {
             onToggleGuide(false);
             onToggleSellers(true);
           }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-extrabold whitespace-nowrap bg-blue-500/12 text-[#38BDF8] hover:text-white hover:bg-blue-500/25 border border-blue-400/35 transition-colors cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-blue-500/15 text-[#38BDF8] hover:text-white hover:bg-blue-500/25 border border-blue-400/35 transition-colors cursor-pointer shrink-0"
         >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Trusted Brand Yupoos (54)</span>
+          <ShieldCheck className="w-4 h-4" />
+          <span>Sellers</span>
         </button>
       </div>
     </div>

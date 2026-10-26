@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   RefreshCw, 
-  Search, 
   Heart, 
   ChevronDown, 
   FileSpreadsheet,
@@ -25,7 +24,7 @@ import {
   LayoutGrid
 } from 'lucide-react';
 import { AgentId, AgentHealthStatus, CurrencyCode, SheetTab } from '../types/index.ts';
-import { DEFAULT_AGENTS, RAIDED_BLACKLIST_AGENTS, CURRENCIES } from '../utils/agentConverter.ts';
+import { DEFAULT_AGENTS, CURRENCIES } from '../utils/agentConverter.ts';
 
 interface HeaderProps {
   selectedAgent: AgentId;
@@ -74,7 +73,7 @@ export const AgentHealthBadge: React.FC<{
     { dot: string; text: string; bg: string; border: string }
   > = {
     Online: {
-      dot: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]',
+      dot: 'bg-emerald-400',
       text: 'text-emerald-300',
       bg: 'bg-emerald-500/12',
       border: 'border-emerald-500/30',
@@ -129,7 +128,6 @@ export const OhMyRepsLogo: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({ size = '
       whileTap={{ scale: 0.98 }}
       className="inline-flex items-center gap-2 select-none group cursor-pointer"
     >
-      {/* OMR Monogram Badge */}
       <div
         className={`relative inline-flex items-center justify-center bg-gradient-to-br from-[#3B82F6] via-[#2563EB] to-[#1D4ED8] font-impact tracking-wider text-white shadow-[0_0_18px_rgba(37,99,235,0.45)] border border-blue-300/30 ${badgeClasses}`}
       >
@@ -137,7 +135,6 @@ export const OhMyRepsLogo: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({ size = '
         <span className="ml-0.5 text-[#38BDF8]">!</span>
       </div>
 
-      {/* OhMyReps! Wordmark */}
       <div className="flex items-baseline leading-none">
         <span className={`font-impact tracking-wide uppercase text-white ${wordmarkClasses}`}>
           OHMY
@@ -157,8 +154,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectAgent,
   currency,
   onSelectCurrency,
-  searchQuery,
-  onSearchChange,
   onSync,
   isSyncing,
   lastSyncedText,
@@ -207,17 +202,16 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-blue-500/15 bg-[#05070B]/92 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2.5 px-4 py-3">
-          {/* Left: Burger Menu Button + Logo + Quick Desktop Nav */}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3">
+          {/* Left: Burger Menu + Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsBurgerOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-500/30 bg-[#0B101B] hover:border-blue-400 hover:bg-blue-600/15 px-3 py-2 text-xs font-bold text-white transition-all cursor-pointer shadow-[0_0_15px_rgba(37,99,235,0.2)]"
-              aria-label="Open navigation menu"
+              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-[#0B101B] hover:border-blue-400/50 p-2 text-white transition-all cursor-pointer"
+              aria-label="Open menu"
             >
               <Menu className="w-4 h-4 text-[#38BDF8]" />
-              <span className="hidden sm:inline">Menu</span>
             </button>
 
             <button
@@ -227,71 +221,11 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <OhMyRepsLogo />
             </button>
-
-            {/* Clean Desktop Page Switcher */}
-            <nav className="hidden lg:flex items-center gap-1 ml-2 pl-3 border-l border-white/10">
-              <button
-                type="button"
-                onClick={navigateToCatalog}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
-                  !isSellersActive && !isGuideActive
-                    ? 'bg-[#2563EB] text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Spreadsheet
-              </button>
-              <button
-                type="button"
-                onClick={navigateToSellers}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
-                  isSellersActive
-                    ? 'bg-[#2563EB] text-white shadow-[0_0_16px_rgba(37,99,235,0.4)]'
-                    : 'text-[#38BDF8] hover:text-white hover:bg-blue-500/15'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Yupoo Sellers (54)</span>
-              </button>
-              <button
-                type="button"
-                onClick={navigateToGuide}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
-                  isGuideActive
-                    ? 'bg-[#2563EB] text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Order Guide</span>
-              </button>
-            </nav>
           </div>
 
-          {/* Center: Quick Search Input (Desktop & Tablet) */}
-          <div className="hidden md:block relative flex-1 max-w-sm">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search items, brands, or sellers..."
-              className="w-full rounded-full border border-blue-500/25 bg-[#0B101B]/95 py-1.5 pl-9 pr-8 text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:bg-[#0E1525] focus:outline-none transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => onSearchChange('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white cursor-pointer"
-                aria-label="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Right: Currency + Saved Agent Combined Switcher & Favorites */}
+          {/* Right: Currency + Saved Agent Switcher & Favorites */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="relative flex items-center rounded-full border border-blue-500/35 bg-[#0B101B] p-0.5">
+            <div className="relative flex items-center rounded-full border border-white/15 bg-[#0B101B] p-0.5">
               {/* Currency Dropdown Trigger */}
               <div className="relative">
                 <button
@@ -316,7 +250,7 @@ export const Header: React.FC<HeaderProps> = ({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.96 }}
                         transition={{ duration: 0.16 }}
-                        className="absolute left-0 mt-2 w-36 rounded-2xl border border-blue-500/30 bg-[#0B101B] p-1.5 shadow-2xl z-40"
+                        className="absolute right-0 sm:left-0 mt-2 w-36 rounded-2xl border border-blue-500/30 bg-[#0B101B] p-1.5 shadow-2xl z-40"
                       >
                         {CURRENCIES.map((c) => (
                           <button
@@ -342,9 +276,9 @@ export const Header: React.FC<HeaderProps> = ({
                 </AnimatePresence>
               </div>
 
-              <div className="h-4 w-[1px] bg-blue-500/25" />
+              <div className="h-4 w-[1px] bg-white/10" />
 
-              {/* Saved Agent Dropdown Trigger with Logo */}
+              {/* Saved Agent Dropdown Trigger */}
               <div className="relative">
                 <button
                   type="button"
@@ -375,14 +309,13 @@ export const Header: React.FC<HeaderProps> = ({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.96 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute right-0 mt-2 w-80 rounded-2xl border border-blue-500/35 bg-[#0A0F1A] p-2 shadow-2xl z-40"
+                        className="absolute right-0 mt-2 w-64 rounded-2xl border border-blue-500/35 bg-[#0A0F1A] p-2 shadow-2xl z-40"
                       >
-                        <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10 mb-1 flex items-center justify-between">
-                          <span>Select Default Agent</span>
-                          <span className="text-emerald-400 font-mono">1-CLICK SAVED</span>
+                        <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-white/10 mb-1">
+                          Select Default Agent
                         </div>
 
-                        <div className="max-h-80 overflow-y-auto space-y-0.5 pr-0.5">
+                        <div className="max-h-72 overflow-y-auto space-y-0.5 pr-0.5">
                           {activeSafeAgents.map((agent) => {
                             const isSelected = agent.id === selectedAgent;
                             return (
@@ -403,56 +336,21 @@ export const Header: React.FC<HeaderProps> = ({
                                   <img
                                     src={agent.logoUrl}
                                     alt={agent.name}
-                                    className="h-6 w-6 rounded-full object-contain bg-white/10 p-0.5 shrink-0"
+                                    className="h-5 w-5 rounded-full object-contain bg-white/10 p-0.5 shrink-0"
                                   />
                                   <div className="min-w-0">
-                                    <div className="font-bold flex items-center gap-1.5 flex-wrap">
-                                      <span>{agent.name}</span>
-                                      <AgentHealthBadge status={agent.healthStatus} compact />
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 truncate max-w-[180px] mt-0.5">
+                                    <div className="font-bold truncate">{agent.name}</div>
+                                    <div className="text-[10px] text-slate-400 truncate">
                                       {agent.couponHeadline}
                                     </div>
                                   </div>
                                 </div>
                                 {isSelected && (
-                                  <span className="text-blue-400 text-xs font-bold shrink-0">Saved ✓</span>
+                                  <span className="text-blue-400 text-xs font-bold shrink-0">✓</span>
                                 )}
                               </button>
                             );
                           })}
-
-                          {/* Crossed-Out Agents */}
-                          <div className="pt-2 mt-1.5 border-t border-white/10 px-2.5 py-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              {RAIDED_BLACKLIST_AGENTS.map((bad) => (
-                                <div
-                                  key={bad.id}
-                                  className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 line-through opacity-40 select-none"
-                                >
-                                  <img
-                                    src={bad.logoUrl}
-                                    alt={bad.name}
-                                    className="h-3.5 w-3.5 rounded-full grayscale object-contain"
-                                  />
-                                  <span>{bad.name}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="border-t border-white/10 mt-1.5 pt-1.5">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsAgentMenuOpen(false);
-                              onOpenCompareModal();
-                            }}
-                            className="w-full rounded-xl bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 py-1.5 text-xs font-bold text-blue-300 transition-colors cursor-pointer"
-                          >
-                            Compare All 12 Agents & Claim Coupons
-                          </button>
                         </div>
                       </motion.div>
                     </>
@@ -467,7 +365,7 @@ export const Header: React.FC<HeaderProps> = ({
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                 showFavoritesOnly
                   ? 'border-blue-500 bg-blue-600/20 text-blue-300'
-                  : 'border-blue-500/25 bg-[#0B101B] text-slate-300 hover:text-white'
+                  : 'border-white/15 bg-[#0B101B] text-slate-300 hover:text-white'
               }`}
               aria-label="View Favorites"
             >
@@ -482,7 +380,6 @@ export const Header: React.FC<HeaderProps> = ({
       <AnimatePresence>
         {isBurgerOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -491,13 +388,12 @@ export const Header: React.FC<HeaderProps> = ({
               className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm"
             />
 
-            {/* Drawer Panel */}
             <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 380, damping: 34 }}
-              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[88vw] bg-[#070B14] border-r border-blue-500/25 flex flex-col justify-between overflow-y-auto shadow-[20px_0_60px_rgba(0,0,0,0.85)]"
+              className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-[#070B14] border-r border-blue-500/25 flex flex-col justify-between overflow-y-auto shadow-2xl"
             >
               <div className="p-4 space-y-5">
                 {/* Drawer Header */}
@@ -513,26 +409,22 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
 
-                {/* Main Pages Section */}
+                {/* Main Pages */}
                 <div className="space-y-1.5">
-                  <div className="px-2 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-                    Navigation
-                  </div>
-
                   <button
                     type="button"
                     onClick={navigateToCatalog}
                     className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all cursor-pointer ${
                       !isSellersActive && !isGuideActive && !showFavoritesOnly
-                        ? 'bg-[#2563EB] text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
+                        ? 'bg-[#2563EB] text-white'
                         : 'text-slate-300 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
                       <ShoppingBag className="w-4 h-4" />
-                      <span>Spreadsheet Catalog</span>
+                      <span>Catalog</span>
                     </span>
-                    <span className="font-mono text-[10px] opacity-80">{itemCount}+ items</span>
+                    <span className="font-mono text-[10px] opacity-80">{itemCount}</span>
                   </button>
 
                   <button
@@ -540,16 +432,13 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={navigateToSellers}
                     className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all cursor-pointer ${
                       isSellersActive
-                        ? 'bg-[#2563EB] text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
-                        : 'bg-blue-500/10 border border-blue-400/25 text-[#38BDF8] hover:bg-blue-500/20 hover:text-white'
+                        ? 'bg-[#2563EB] text-white'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>Trusted Brand Yupoo Sellers</span>
-                    </span>
-                    <span className="rounded-full bg-blue-500/20 px-2 py-0.5 font-mono text-[10px]">
-                      54 Brands
+                      <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
+                      <span>Sellers</span>
                     </span>
                   </button>
 
@@ -558,40 +447,35 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={navigateToGuide}
                     className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all cursor-pointer ${
                       isGuideActive
-                        ? 'bg-[#2563EB] text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
+                        ? 'bg-[#2563EB] text-white'
                         : 'text-slate-300 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     <span className="flex items-center gap-2.5">
                       <BookOpen className="w-4 h-4 text-blue-400" />
-                      <span>How to Order & Agent Guide</span>
+                      <span>How to Order</span>
                     </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => {
-                      onToggleFavorites();
                       setIsBurgerOpen(false);
+                      onOpenCompareModal();
                     }}
-                    className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all cursor-pointer ${
-                      showFavoritesOnly
-                        ? 'bg-[#2563EB] text-white'
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
+                    className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white transition-all cursor-pointer"
                   >
                     <span className="flex items-center gap-2.5">
-                      <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white text-white' : 'text-rose-400'}`} />
-                      <span>Saved Favorites</span>
+                      <Gift className="w-4 h-4 text-[#38BDF8]" />
+                      <span>Agents & Coupons</span>
                     </span>
-                    <span className="font-mono text-[10px]">{favoritesCount}</span>
                   </button>
                 </div>
 
-                {/* Spreadsheet Categories Quick Jump */}
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
+                {/* Categories List */}
+                <div className="space-y-1.5 pt-3 border-t border-white/10">
                   <div className="px-2 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-                    Spreadsheet Categories
+                    Categories
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     {tabs.map((tab) => {
@@ -611,7 +495,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className={`flex items-center justify-between rounded-xl px-2.5 py-2 text-left text-[11px] font-bold transition-colors cursor-pointer ${
                             isTabActive
                               ? 'bg-blue-600/25 border border-blue-500/50 text-white'
-                              : 'bg-[#0B101B] border border-white/5 text-slate-300 hover:border-blue-500/30 hover:text-white'
+                              : 'bg-[#0B101B] border border-white/5 text-slate-300 hover:text-white'
                           }`}
                         >
                           <span className="flex items-center gap-1.5 truncate">
@@ -628,57 +512,22 @@ export const Header: React.FC<HeaderProps> = ({
                     })}
                   </div>
                 </div>
-
-                {/* Active Saved Agent Card inside Drawer */}
-                <div className="rounded-2xl border border-blue-500/30 bg-[#0B1222] p-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#38BDF8]">
-                      Active Saved Agent
-                    </span>
-                    <AgentHealthBadge status={currentAgent.healthStatus} compact />
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    {currentAgent.logoUrl && (
-                      <img
-                        src={currentAgent.logoUrl}
-                        alt={currentAgent.name}
-                        className="h-8 w-8 rounded-full object-contain bg-white/10 p-1"
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm font-extrabold text-white">{currentAgent.name}</div>
-                      <div className="text-[11px] text-blue-300 font-mono">{currentAgent.couponHeadline}</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    {currentAgent.signupUrl && (
-                      <a
-                        href={currentAgent.signupUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1 rounded-xl bg-[#2563EB] hover:bg-blue-500 px-2.5 py-2 text-[11px] font-extrabold text-white transition-colors"
-                      >
-                        <span>Claim Coupons</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsBurgerOpen(false);
-                        onOpenCompareModal();
-                      }}
-                      className="inline-flex items-center justify-center gap-1 rounded-xl border border-blue-400/30 bg-white/5 hover:bg-white/10 px-2.5 py-2 text-[11px] font-bold text-slate-200 transition-colors cursor-pointer"
-                    >
-                      <Gift className="w-3.5 h-3.5 text-[#38BDF8]" />
-                      <span>All 12 Agents</span>
-                    </button>
-                  </div>
-                </div>
               </div>
 
-              {/* Drawer Footer Controls */}
+              {/* Drawer Footer */}
               <div className="p-4 border-t border-white/10 bg-[#05070B] space-y-2">
+                {currentAgent.signupUrl && (
+                  <a
+                    href={currentAgent.signupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] hover:bg-blue-500 py-2 text-xs font-extrabold text-white transition-colors"
+                  >
+                    <span>Claim {currentAgent.name} Coupons</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+
                 <div className="flex items-center justify-between gap-2">
                   <button
                     type="button"
@@ -687,10 +536,10 @@ export const Header: React.FC<HeaderProps> = ({
                       setIsBurgerOpen(false);
                     }}
                     disabled={isSyncing}
-                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] hover:border-blue-500/40 py-2 text-[11px] font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] py-1.5 text-[11px] text-slate-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-blue-400' : ''}`} />
-                    <span>Sync Sheet ({lastSyncedText})</span>
+                    <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-blue-400' : ''}`} />
+                    <span>Sync ({lastSyncedText})</span>
                   </button>
                   <button
                     type="button"
@@ -698,11 +547,10 @@ export const Header: React.FC<HeaderProps> = ({
                       setIsBurgerOpen(false);
                       onOpenCustomSheetModal();
                     }}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] hover:border-blue-500/40 px-3 py-2 text-[11px] font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
-                    title="Change Google Sheet Source"
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-[#0B101B] px-3 py-1.5 text-[11px] text-slate-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Source</span>
+                    <FileSpreadsheet className="w-3 h-3" />
+                    <span>Sheet</span>
                   </button>
                 </div>
               </div>

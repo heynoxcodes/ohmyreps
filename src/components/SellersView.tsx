@@ -765,16 +765,12 @@ export const SellersView: React.FC<SellersViewProps> = ({
       {/* Compact Header Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-blue-500/30 bg-gradient-to-br from-[#0B1325] via-[#090E1A] to-[#05070B] p-5 sm:p-6 shadow-[0_16px_45px_rgba(0,0,0,0.55)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/15 border border-blue-400/30 px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-[#38BDF8]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>54 Brands · Vetted Yupoo & Store Directory</span>
-            </div>
+          <div className="space-y-1">
             <h2 className="font-impact text-3xl sm:text-4xl tracking-wide text-white uppercase">
-              Trusted Brand <span className="text-[#38BDF8] rephub-blue-glow">Yupoo Sellers</span>
+              BEST <span className="text-[#38BDF8] rephub-blue-glow">SELLERS</span> BY BRAND
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Curated list of the best Yupoo albums, Weidian stores, and Taobao sellers organized by brand.
+              The best Yupoo, Weidian, and Taobao sellers organized by brand.
             </p>
           </div>
 
@@ -784,7 +780,7 @@ export const SellersView: React.FC<SellersViewProps> = ({
             className="inline-flex items-center gap-2 self-start sm:self-center rounded-full border border-blue-500/30 bg-[#0B101B] hover:bg-blue-600/20 px-4 py-2 text-xs font-bold text-slate-200 hover:text-white transition-colors cursor-pointer shrink-0"
           >
             <ArrowLeft className="w-4 h-4 text-[#38BDF8]" />
-            <span>Back to Spreadsheet Catalog</span>
+            <span>Back to Catalog</span>
           </button>
         </div>
       </div>
