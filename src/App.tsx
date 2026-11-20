@@ -35,6 +35,9 @@ import {
   BestPicksCarousel
 } from './components/BestPicksCarousel.tsx';
 import {
+  PoshrepBanner
+} from './components/PoshrepBanner.tsx';
+import {
   getOmrFeaturedOrder,
   getBestPicksForCategory
 } from './utils/featuredOrder.ts';
@@ -394,6 +397,9 @@ export default function App() {
         isSellersActive={isSellersActive}
         onToggleSellers={setIsSellersActive}
       />
+
+      {/* Featured #1 Seller Banner at top of Home Page */}
+      {!isSellersActive && !isGuideActive && <PoshrepBanner />}
 
       {/* 2. Punchy OHMYREPS! Hero with Funny Slogans & 1-Click Saved Agent Bar */}
       <BannerHero

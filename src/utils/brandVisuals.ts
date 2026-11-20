@@ -32,7 +32,7 @@ const BRAND_DICTIONARY: Record<string, BrandTheme> = {
   jordan: { name: 'Air Jordan', shortCode: 'AJ', bgGradient: 'from-red-950/60 to-zinc-900', accentColor: 'text-red-400', tagline: 'Jumpman Retro' },
   stussy: { name: 'Stüssy', shortCode: 'STU', bgGradient: 'from-zinc-900 to-zinc-950', accentColor: 'text-zinc-200', tagline: 'World Tour 8-Ball' },
   moncler: { name: 'Moncler', shortCode: 'MNC', bgGradient: 'from-blue-950/60 to-zinc-900', accentColor: 'text-blue-300', tagline: 'Maya Goose Down' },
-  mm6: { name: 'Maison Margiela', shortCode: 'MM6', bgGradient: 'from-stone-900 to-zinc-950', accentCode: 'text-stone-300', tagline: 'Numeric Stitched' },
+  mm6: { name: 'Maison Margiela', shortCode: 'MM6', bgGradient: 'from-stone-900 to-zinc-950', accentColor: 'text-stone-300', tagline: 'Numeric Stitched' },
 };
 
 export function getBrandVisual(title: string, category: string): BrandTheme {

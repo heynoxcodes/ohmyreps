@@ -13,9 +13,12 @@ import {
   Footprints,
   Briefcase,
   Headphones,
-  Layers
+  Layers,
+  Crown,
+  Sparkles
 } from 'lucide-react';
 import { AgentId } from '../types/index.ts';
+import { POSHREP_YUPOO_URL, POSHREP_LOGO_PATH } from './PoshrepBanner.tsx';
 
 export type SellerCategory = 'all' | 'Clothes' | 'Shoes' | 'Accessories' | 'Electronics';
 
@@ -34,10 +37,24 @@ export interface BrandSellerCard {
   category: Exclude<SellerCategory, 'all'>;
   tagline?: string;
   warning?: string;
+  logo?: string;
+  isFeatured?: boolean;
   sellers: SellerEntry[];
 }
 
 export const CURATED_BRAND_SELLERS: BrandSellerCard[] = [
+  // ==================== #1 FEATURED BEST SELLER ====================
+  {
+    id: 'poshrep',
+    brand: 'Poshrep',
+    category: 'Clothes',
+    tagline: 'Our #1 Best Seller — top-tier 1:1 quality, massive catalog & fast warehouse shipping',
+    logo: POSHREP_LOGO_PATH,
+    isFeatured: true,
+    sellers: [
+      { name: 'Poshrep Official Yupoo', url: POSHREP_YUPOO_URL, tier: '#1 Best Seller' },
+    ],
+  },
   // ==================== CLOTHES ====================
   {
     id: 'acne-studios',
@@ -785,6 +802,55 @@ export const SellersView: React.FC<SellersViewProps> = ({
         </div>
       </div>
 
+      {/* Pinned #1 Best Seller Spotlight: Poshrep */}
+      <div className="relative overflow-hidden rounded-3xl border border-[#EEFF66]/45 bg-gradient-to-r from-[#141A0C] via-[#0B101B] to-[#0B1325] p-5 sm:p-6 shadow-[0_14px_40px_rgba(238,255,102,0.12)]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-16 -top-16 h-48 w-64 rounded-full bg-[#EEFF66]/15 blur-3xl"
+        />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <img
+                src={POSHREP_LOGO_PATH}
+                alt="Poshrep Logo"
+                className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl object-cover border-2 border-[#EEFF66]/85 shadow-[0_0_24px_rgba(238,255,102,0.35)]"
+              />
+              <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#EEFF66] text-[#05070B] shadow-md">
+                <Crown className="h-3.5 w-3.5 fill-[#05070B]" />
+              </span>
+            </div>
+
+            <div className="min-w-0 space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#EEFF66] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#05070B]">
+                  <Sparkles className="h-3 w-3 fill-[#05070B]" />
+                  <span>#1 Best Seller</span>
+                </span>
+                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                  Poshrep
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+                Our top-rated &amp; #1 recommended Yupoo seller. Browse Poshrep for top-tier 1:1 quality, clean stitching, and fast shipping to your agent warehouse.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={POSHREP_YUPOO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#EEFF66] hover:bg-[#f4ff8c] px-5 py-2.5 text-xs font-black text-[#05070B] shadow-[0_0_22px_rgba(238,255,102,0.35)] transition-all whitespace-nowrap"
+            >
+              <span>Open Poshrep Yupoo</span>
+              <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Category Filter Tabs + Brand Search Bar */}
       <div className="sticky top-[61px] z-20 -mx-4 px-4 py-3 bg-[#05070B]/95 backdrop-blur-xl border-b border-blue-500/15 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
@@ -850,18 +916,36 @@ export const SellersView: React.FC<SellersViewProps> = ({
               layout
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col justify-between rounded-2xl border border-blue-500/20 bg-[#0B101B]/90 p-4 hover:border-blue-500/45 transition-all shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+              className={`flex flex-col justify-between rounded-2xl p-4 transition-all ${
+                card.isFeatured
+                  ? 'border border-[#EEFF66]/55 bg-gradient-to-b from-[#141A0C]/95 via-[#0B101B]/95 to-[#0B101B]/95 hover:border-[#EEFF66] shadow-[0_8px_30px_rgba(238,255,102,0.12)]'
+                  : 'border border-blue-500/20 bg-[#0B101B]/90 hover:border-blue-500/45 shadow-[0_8px_30px_rgba(0,0,0,0.4)]'
+              }`}
             >
               <div>
                 {/* Brand Header */}
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <span className="inline-block text-[10px] font-mono uppercase tracking-wider text-blue-400 mb-0.5">
-                      {card.category}
-                    </span>
-                    <h3 className="text-base font-extrabold text-white leading-snug">
-                      {card.brand}
-                    </h3>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {card.logo && (
+                      <img
+                        src={card.logo}
+                        alt={`${card.brand} logo`}
+                        className="h-10 w-10 rounded-xl object-cover border border-[#EEFF66]/70 shrink-0"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider mb-0.5 ${
+                          card.isFeatured ? 'text-[#EEFF66] font-bold' : 'text-blue-400'
+                        }`}
+                      >
+                        {card.isFeatured && <Crown className="w-3 h-3 fill-[#EEFF66]" />}
+                        <span>{card.isFeatured ? '#1 Best Seller' : card.category}</span>
+                      </span>
+                      <h3 className="text-base font-extrabold text-white leading-snug truncate">
+                        {card.brand}
+                      </h3>
+                    </div>
                   </div>
 
                   <button
@@ -932,7 +1016,13 @@ export const SellersView: React.FC<SellersViewProps> = ({
                               </div>
                             </div>
 
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#2563EB] group-hover:bg-blue-500 px-3 py-1.5 text-[11px] font-extrabold text-white shrink-0 transition-colors">
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-extrabold shrink-0 transition-colors ${
+                                card.isFeatured
+                                  ? 'bg-[#EEFF66] group-hover:bg-[#f4ff8c] text-[#05070B]'
+                                  : 'bg-[#2563EB] group-hover:bg-blue-500 text-white'
+                              }`}
+                            >
                               <span>{isYupoo ? 'Open Yupoo' : 'Open Link'}</span>
                               <ExternalLink className="w-3 h-3" />
                             </span>
